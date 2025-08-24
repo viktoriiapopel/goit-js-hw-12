@@ -12,6 +12,7 @@ const loadMoreBtn = document.querySelector('.load-more');
 
 let currentPage = 1; 
 let currentQuery = '';
+const PER_PAGE = 15;
 
 
 async function searchImages(query) {
@@ -23,7 +24,7 @@ async function searchImages(query) {
   currentQuery = query;
 
   try {
-    const data = await getImagesByQuery(query, currentPage);
+    const data = await getImagesByQuery(query, currentPage, PER_PAGE);
 
     if (data.hits.length === 0) {
       iziToast.warning({
@@ -36,10 +37,16 @@ async function searchImages(query) {
 
     createGallery(data.hits);
 
-      if (data.totalHits > currentPage * 15) {
+      if (data.totalHits > currentPage * PER_PAGE) {
       showLoadMoreButton();
     } else {
-      hideLoadMoreButton();
+        hideLoadMoreButton();
+        iziToast.info({
+    title: 'Info',
+    message: "You've reached the end of search results!",
+    position: 'topRight',
+  });
+
     }
 
   } catch (error) {
@@ -48,6 +55,7 @@ async function searchImages(query) {
       message: 'Something went wrong. Please try again later.',
       position: 'topRight',
     });
+    hideLoadMoreButton();
   } finally {
     hideLoader();
   }
@@ -72,28 +80,47 @@ formEl.addEventListener('submit', event => {
 loadMoreBtn.addEventListener('click', async () => {
   currentPage += 1; 
   showLoader();
+  loadMoreBtn.disabled = true;
 
   try {
-    const data = await getImagesByQuery(currentQuery, currentPage);
+    const data = await getImagesByQuery(currentQuery, currentPage, PER_PAGE);
 
     createGallery(data.hits);
+    smoothScroll();
 
-   
-    if (currentPage * 15 >= data.totalHits) {
-      hideLoadMoreButton();
-      iziToast.info({
-        title: 'Info',
-        message: "You've reached the end of search results!",
-        position: 'topRight',
-      });
+
+    if (currentPage * PER_PAGE >= data.totalHits) {
+  hideLoadMoreButton();
+  iziToast.info({
+    title: 'Info',
+    message: "You've reached the end of search results!",
+    position: 'topRight',
+  });
+} else {
+  showLoadMoreButton();
     }
-  } catch (error) {
-    iziToast.error({
-      title: 'Error',
-      message: 'Something went wrong. Please try again later.',
-      position: 'topRight',
-    });
+    } catch (error) {
+  iziToast.error({
+    title: 'Error',
+    message: 'Something went wrong. Please try again later.',
+    position: 'topRight',
+  });
+  hideLoadMoreButton();
+
   } finally {
     hideLoader();
+    loadMoreBtn.disabled = false;
   }
 });
+
+
+function smoothScroll() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+}
