@@ -10,6 +10,9 @@ const formEl = document.querySelector('.form');
 const inputEl = formEl.querySelector('input[name="search-text"]');
 const loadMoreBtn = document.querySelector('.load-more');
 
+hideLoadMoreButton();
+
+
 let currentPage = 1; 
 let currentQuery = '';
 const PER_PAGE = 15;
@@ -115,12 +118,14 @@ loadMoreBtn.addEventListener('click', async () => {
 
 
 function smoothScroll() {
-  const { height: cardHeight } = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect();
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
+  const gallery = document.querySelector('.gallery');
+  const lastCard = gallery.lastElementChild; 
+  
+  if (lastCard) {
+    const { height: cardHeight } = lastCard.getBoundingClientRect();
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+  }
 }
