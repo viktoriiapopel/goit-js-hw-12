@@ -79,8 +79,9 @@ formEl.addEventListener('submit', event => {
 
 loadMoreBtn.addEventListener('click', async () => {
   currentPage += 1; 
+  hideLoadMoreButton();
   showLoader();
-  loadMoreBtn.disabled = true;
+  
 
   try {
     const data = await getImagesByQuery(currentQuery, currentPage, PER_PAGE);
@@ -109,7 +110,6 @@ loadMoreBtn.addEventListener('click', async () => {
 
   } finally {
     hideLoader();
-    loadMoreBtn.disabled = false;
   }
 });
 
