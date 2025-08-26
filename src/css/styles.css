@@ -119,6 +119,7 @@ button {
   height: 40px;
   animation: spin 1s linear infinite;
   margin: 20px auto;
+  display: block;
 }
 
 .hidden {
